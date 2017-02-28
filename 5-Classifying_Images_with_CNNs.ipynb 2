@@ -1,0 +1,273 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": true,
+    "editable": true
+   },
+   "source": [
+    "# Classifying Images with CNNs\n",
+    "\n",
+    "In this exercise you will design a Convolutional Neural Network (CNN) for MNIST. CNNs are the workhorses of modern computer vision."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {
+    "collapsed": false,
+    "deletable": true,
+    "editable": true
+   },
+   "outputs": [],
+   "source": [
+    "%matplotlib inline\n",
+    "\n",
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "\n",
+    "from keras.datasets import mnist\n",
+    "from keras.models import Sequential\n",
+    "from keras.optimizers import SGD, RMSprop\n",
+    "from keras.utils import np_utils"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true,
+    "deletable": true,
+    "editable": true
+   },
+   "source": [
+    "## CNN\n",
+    "\n",
+    "Let's build a convolutional model! For this, we need to have the data in its original shape. Also note that when we reshape the data below, we add a dimension of 1 - this is the number of **channels** in the image, which is just 1 because these are grayscale images. If they were color, this would be 3 for RGB. Make sure you understand how and why we are preparing the data below."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "collapsed": false,
+    "deletable": true,
+    "editable": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(60000, 28, 28, 1)\n"
+     ]
+    }
+   ],
+   "source": [
+    "(X_train, y_train), (X_test, y_test) = mnist.load_data()\n",
+    "\n",
+    "X_train = X_train.reshape(X_train.shape[0], 28, 28, 1)\n",
+    "X_test = X_test.reshape(X_test.shape[0], 28, 28, 1)\n",
+    "X_train = X_train.astype('float32')\n",
+    "X_test = X_test.astype('float32')\n",
+    "X_train /= 255\n",
+    "X_test /= 255\n",
+    "print X_train.shape\n",
+    "\n",
+    "y_train = np_utils.to_categorical(y_train, 10)\n",
+    "y_test = np_utils.to_categorical(y_test, 10)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": true,
+    "editable": true
+   },
+   "source": [
+    "### Exercise 1 - design a CNN for MNIST\n",
+    "\n",
+    "It is up to you what the model will be. Here are some things you need to decide:\n",
+    "* how many convolutional layers?\n",
+    "* what spatial size will your convolutions be?\n",
+    "* how many channels will your convolutions be?\n",
+    "* what nonlinearity will you use?\n",
+    "* will you use pooling? what type?\n",
+    "* how many fully-connected layers will you have?\n",
+    "* will you use dropout?\n",
+    "* what batch size?\n",
+    "\n",
+    "Keras provides a special layer called `Flatten` to flatten the convolutional features into a vector before the fully-connected layers. You should look at the documentation for Keras's convolutional layers: http://keras.io/layers/convolutional/. In particular, you may want to look at `Convolution2D`, `MaxPooling2D`, `AveragePooling2D`, `Flatten`, and `Dropout`. For this problem, you make want to use the `'rmsprop'` optimizer - it is an algorithm that adapts the learning rate during learning for you automatically.\n",
+    "\n",
+    "Can you get to 98% accuracy? You shouldn't need more than a few epochs to do pretty well.\n",
+    "\n",
+    "Suggestions:\n",
+    "* Try using at least 2 convolutional layers. This should get you off to a good start and it will come in handy later."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {
+    "collapsed": false,
+    "deletable": true,
+    "editable": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Train on 11999 samples, validate on 48001 samples\n",
+      "Epoch 1/10\n",
+      "14s - loss: 0.9732 - acc: 0.6827 - val_loss: 0.3855 - val_acc: 0.8865\n",
+      "Epoch 2/10\n",
+      "14s - loss: 0.4740 - acc: 0.8550 - val_loss: 0.2922 - val_acc: 0.9124\n",
+      "Epoch 3/10\n",
+      "14s - loss: 0.3805 - acc: 0.8837 - val_loss: 0.2518 - val_acc: 0.9257\n",
+      "Epoch 4/10\n",
+      "14s - loss: 0.3307 - acc: 0.9002 - val_loss: 0.2186 - val_acc: 0.9357\n",
+      "Epoch 5/10\n",
+      "14s - loss: 0.2939 - acc: 0.9098 - val_loss: 0.2001 - val_acc: 0.9400\n",
+      "Epoch 6/10\n",
+      "14s - loss: 0.2610 - acc: 0.9198 - val_loss: 0.1832 - val_acc: 0.9442\n",
+      "Epoch 7/10\n",
+      "14s - loss: 0.2391 - acc: 0.9284 - val_loss: 0.1620 - val_acc: 0.9505\n",
+      "Epoch 8/10\n",
+      "14s - loss: 0.2155 - acc: 0.9337 - val_loss: 0.1466 - val_acc: 0.9559\n",
+      "Epoch 9/10\n",
+      "14s - loss: 0.1946 - acc: 0.9395 - val_loss: 0.1346 - val_acc: 0.9592\n",
+      "Epoch 10/10\n",
+      "14s - loss: 0.1776 - acc: 0.9465 - val_loss: 0.1286 - val_acc: 0.9614\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "<keras.callbacks.History at 0x7fab81089f90>"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "from keras.layers.core import Dense, Dropout, Activation\n",
+    "from keras.layers import Convolution2D, MaxPooling2D, AveragePooling2D, Flatten\n",
+    "from keras.optimizers import Adam\n",
+    "\n",
+    "model = Sequential()\n",
+    "\n",
+    "# Design a CNN\n",
+    "\n",
+    "model.add(Convolution2D(32, 3, 3,\n",
+    "                        border_mode='valid',\n",
+    "                        input_shape=(28,28,1)))\n",
+    "model.add(Activation('relu'))\n",
+    "model.add(Convolution2D(32, 3, 3))\n",
+    "model.add(Activation('relu'))\n",
+    "model.add(MaxPooling2D(pool_size=(2, 2)))\n",
+    "model.add(Dropout(0.25))\n",
+    "model.add(Flatten())\n",
+    "model.add(Dense(128))\n",
+    "model.add(Activation('relu'))\n",
+    "model.add(Dropout(0.5))\n",
+    "model.add(Dense(10))\n",
+    "model.add(Activation('softmax'))\n",
+    "\n",
+    "opt = SGD()\n",
+    "model.compile(loss='categorical_crossentropy',\n",
+    "              optimizer=opt,\n",
+    "              metrics=['accuracy'])\n",
+    "\n",
+    "# Fit your model\n",
+    "model.fit(X_train, y_train, nb_epoch=10, batch_size=16, verbose=2, validation_split=0.8)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "collapsed": false,
+    "deletable": true,
+    "editable": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "('Test score:', 0.12115274960724637)\n",
+      "('Test accuracy:', 0.96509999999999996)\n"
+     ]
+    }
+   ],
+   "source": [
+    "score = model.evaluate(X_test, y_test, verbose=2)\n",
+    "print('Test score:', score[0])\n",
+    "print('Test accuracy:', score[1])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": true,
+    "editable": true
+   },
+   "source": [
+    "## Saving a trained model\n",
+    "\n",
+    "Keras allows you to save and restore models. The model structure can be saved as JSON and the parameters as HDF5. Save your trained model for later:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "collapsed": false,
+    "deletable": true,
+    "editable": true
+   },
+   "outputs": [],
+   "source": [
+    "with open('mnist_cnn.json', 'w') as f:\n",
+    "    f.write(model.to_json())\n",
+    "\n",
+    "model.save_weights('mnist_cnn_weights.h5')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true,
+    "deletable": true,
+    "editable": true
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 2",
+   "language": "python",
+   "name": "python2"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 2
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython2",
+   "version": "2.7.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 0
+}
